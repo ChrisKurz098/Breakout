@@ -47,9 +47,9 @@ https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_J
    
     var bricks = []; //make a variable array with nothing in it
     function setBricks(){
-for(var c=0; c<brickColumnCount; c++) {
+for(var c=0; c<brickColumnCount; c++) { //moves through each value in the array based on the specifed number of columbs
     bricks[c] = [];
-    for(var r=0; r<brickRowCount; r++) {
+    for(var r=0; r<brickRowCount; r++) {//moves through each value in the array based on the specifed number of rows
         bricks[c][r] = { x: 0, y: 0 , status : 1};
     }
   }}
