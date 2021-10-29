@@ -1,0 +1,242 @@
+<!-- This is code was written by following the istructions at
+https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Gamedev Canvas Workshop</title>
+    <style>
+    	* { padding: 0; margin: 0; }
+    	canvas { background: #eee; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="480" height="320"></canvas>
+
+<script>
+	var canvas = document.getElementById("myCanvas"); //refrence the "canvas" as a variable
+    var ctx = canvas.getContext("2d"); //refrence the context of the canvas as a "2d" render
+    var x = canvas.width/2; //this specifies the xy cord of the object to be drawn. it is set to the center of the canvas
+    var y = canvas.height-30; //this specifies the  y cord 
+    var dx = .5; //these two variable are how "fast" the object will move in either direction
+    var dy = -.5;//used for collision as it describes where X or Y will be in the next frame
+    var ballRadius = 10; //this specifies the radius of our ball. This is used for collision calculations
+    ///Define the paddle////
+    var paddleHeight = 10;
+    var paddleWidth = 75;
+    var paddleX = (canvas.width-paddleWidth) / 2; //the paddle only ever moves on the x axis so there is no need to specify its y axis variable
+    //Key press variables
+    var rightPressed = false;
+    var leftPressed = false;
+    //score
+    var score=0
+    var lives=3
+    var level=1
+    //Blocks//
+    var brickRowCount = 1;
+    var brickColumnCount = 5;
+    var brickWidth = 75;
+    var brickHeight = 20;
+    var brickPadding = 10;
+    var brickOffsetTop = 30;
+    var brickOffsetLeft = 30;
+    var bricksLeft=brickRowCount*brickColumnCount;
+    //build block array//
+   
+    var bricks = []; //make a variable array with nothing in it
+    function setBricks(){
+for(var c=0; c<brickColumnCount; c++) {
+    bricks[c] = [];
+    for(var r=0; r<brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0 , status : 1};
+    }
+  }}
+setBricks();
+
+    //Key press mouse movement
+    document.addEventListener("mousemove", mouseMoveHandler, false);
+    document.addEventListener("keydown", keyDownHandler, false); //When the keydown event is fired on any of the keys on your keyboard (when they are pressed), the keyDownHandler() function will be executed
+    document.addEventListener("keyup", keyUpHandler, false);
+
+    ///Mouse Movement Functions///
+    function mouseMoveHandler(e) {
+    var relativeX = e.clientX - canvas.offsetLeft;
+    if(relativeX > 0 && relativeX < canvas.width) {
+        paddleX = relativeX - paddleWidth/2;
+    }
+}
+    ///Keyboard Key functions////
+    function keyDownHandler(e) { ///if a key is pressed down
+    if(e.key == "Right" || e.key == "ArrowRight") { //if the key is the right arrow
+        rightPressed = true; //set right press to true
+    }
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        leftPressed = true;
+    }
+}
+
+function keyUpHandler(e) { //if a key is released
+    if(e.key == "Right" || e.key == "ArrowRight") {// and it is the right arrow
+        rightPressed = false; //set right key pressed variable to false
+    }
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        leftPressed = false;
+    }
+}
+
+function collisionDetection() {
+    for(var c=0; c<brickColumnCount; c++) {
+        for(var r=0; r<brickRowCount; r++) {
+            var b = bricks[c][r];
+            // calculations
+            if(b.status == 1) {
+            if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+                dy = -dy;
+                b.status = 0
+                bricksLeft--
+                score +=100;
+                if(bricksLeft <=0) { //use the score to determine if the blocks are clear
+                        //alert("YOU WIN, CONGRATULATIONS!");
+                        level++
+                        brickRowCount++
+                        dx+=.2
+                        dy+=.2
+                        x = canvas.width/2;
+                        y = canvas.height-30;
+                        paddleX = (canvas.width-paddleWidth)/2;
+                        bricksLeft=brickRowCount*brickColumnCount;
+                        setBricks();
+ 
+                        //document.location.reload();
+                        //clearInterval(interval); // Needed for Chrome to end game
+                    }
+            }
+            }
+        }
+    }
+}
+    ///////Draw Loops/////
+    function drawLives() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+}
+function drawLevel() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#0335DD";
+    ctx.fillText("Level: "+level, canvas.width-135, 20);
+}
+    function drawScore() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("Score: "+score, 8, 20);
+}
+
+    function drawball(){
+        ctx.beginPath();
+        ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+        ctx.fillStyle = "#0095DD";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function drawPaddle() {
+    ctx.beginPath();
+    ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
+    ctx.fillStyle = "#0095DD";
+    ctx.fill();
+    ctx.closePath();
+    }
+
+    function drawBricks() {
+    for(var c=0; c<brickColumnCount; c++) { //loops this as many times at there are columns
+        for(var r=0; r<brickRowCount; r++) {
+            if(bricks[c][r].status == 1) {
+            var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+            var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+            bricks[c][r].x = brickX;
+            bricks[c][r].y = brickY;
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+            }
+        }
+    }
+}
+
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); //this clears the contents of the canvas 
+        drawBricks();
+        drawball(); //runs the draw ball function
+        drawPaddle();
+        drawScore();
+        drawLives();
+        drawLevel();
+        collisionDetection()
+
+
+
+
+//////Wall Collision Check//////
+//We use ballRadius so that the ball bounces on its endge instead of its center
+    if(y + dy > canvas.height-ballRadius-paddleHeight && x >paddleX && x <paddleX+paddleWidth) { ///if the ball hits the paddle
+            dy = -dy;
+            
+            
+          }
+
+    if( y + dy < ballRadius) { //checks for collision at the top of the canvas and reverse the y direction of the ball (dy)
+            dy = -dy;
+          }else if(y + dy > canvas.height-ballRadius) {
+            lives--;
+            if(!lives) {
+         alert("GAME OVER");
+         document.location.reload();
+        }
+        else {
+         x = canvas.width/2;
+         y = canvas.height-30;
+
+          paddleX = (canvas.width-paddleWidth)/2;
+            }
+    
+    }
+
+
+    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {//checks for collision at the left or right of the canvas and reverse the x direction of the ball (dx)
+          dx = -dx;
+         }
+
+    if(rightPressed) {
+        paddleX += 7;
+        if (paddleX + paddleWidth > canvas.width){
+            paddleX = canvas.width - paddleWidth;
+        }
+        }
+
+        else if(leftPressed) {
+        paddleX -= 7;
+        if (paddleX < 0){
+            paddleX = 0;
+        }
+
+        }
+
+        x +=dx //changes xy cord of ball
+        y+=dy
+        requestAnimationFrame(draw);
+    }
+    //listen for key presses
+
+draw();; //this tells the "draw" function to occur. It essentially loops the function
+</script>
+
+</body>
+</html>
+
+
