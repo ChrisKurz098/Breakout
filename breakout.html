@@ -53,10 +53,12 @@ for(var c=0; c<brickColumnCount; c++) { //moves through each value in the array 
         bricks[c][r] = { x: 0, y: 0 , status : 1};
     }
   }}
-setBricks();
+
+
+setBricks(); //runs setBricks function
 
     //Key press mouse movement
-    document.addEventListener("mousemove", mouseMoveHandler, false);
+    document.addEventListener("mousemove", mouseMoveHandler, false); //when mouse moves run moveMouseHandler
     document.addEventListener("keydown", keyDownHandler, false); //When the keydown event is fired on any of the keys on your keyboard (when they are pressed), the keyDownHandler() function will be executed
     document.addEventListener("keyup", keyUpHandler, false);
 
@@ -86,14 +88,18 @@ function keyUpHandler(e) { //if a key is released
     }
 }
 
-function collisionDetection() {
+//Collision Detection ---------------------------------------------------------------
+//runs colission detection on each block
+function collisionDetection() 
+{
     for(var c=0; c<brickColumnCount; c++) {
         for(var r=0; r<brickRowCount; r++) {
-            var b = bricks[c][r];
+            var b = bricks[c][r]; //b=the current brick being checked
             // calculations
-            if(b.status == 1) {
+            if(b.status == 1) { //if the brick exists
+                //check ballx x and y cord against range of brick
             if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
-                dy = -dy;
+                dy = -dy; //reverse ball direction
                 b.status = 0
                 bricksLeft--
                 score +=100;
@@ -184,14 +190,14 @@ function drawLevel() {
 
 //////Wall Collision Check//////
 //We use ballRadius so that the ball bounces on its endge instead of its center
-    if(y + dy > canvas.height-ballRadius-paddleHeight && x >paddleX && x <paddleX+paddleWidth) { ///if the ball hits the paddle
+    if(y + dy >= canvas.height-ballRadius-paddleHeight && x >paddleX && x <paddleX+paddleWidth) { ///if the ball hits the paddle
             dy = -dy;
             
             
           }
 
-    if( y + dy < ballRadius) { //checks for collision at the top of the canvas and reverse the y direction of the ball (dy)
-            dy = -dy;
+    if( y + dy <= ballRadius) { //checks for collision at the top of the canvas and reverse the y direction of the ball (dy)
+            dy = -(dy+(abs(x-paddleX)));
           }else if(y + dy > canvas.height-ballRadius) {
             lives--;
             if(!lives) {
