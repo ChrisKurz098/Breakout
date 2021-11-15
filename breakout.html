@@ -190,13 +190,16 @@ function collisionDetection()
     }
 }
 
-//////Wall Collision Check//////
-//We use ballRadius so that the ball bounces on its endge instead of its center
-    if(y + dy >= canvas.height-ballRadius-paddleHeight && x >paddleX && x <paddleX+paddleWidth) { ///if the ball hits the paddle
-            dy = -dy;
+//////Paddle and Wall Collision Check//////
+//We use ballRadius so that the ball bounces on its edge instead of its center
+//added the +1 to ballRadius because it prevents the ball getting stuck on the corner
+    if(y + dy > canvas.height-ballRadius+1-paddleHeight && x + dx >=paddleX && x+dx <=paddleX+paddleWidth) 
+        { ///if the ball hits the paddle
+        
+            dy = -dy; //flip y direction
             
             
-          }
+        }
 
     if( y + dy <= ballRadius) { //checks for collision at the top of the canvas and reverse the y direction of the ball (dy)
             dy = -dy;
